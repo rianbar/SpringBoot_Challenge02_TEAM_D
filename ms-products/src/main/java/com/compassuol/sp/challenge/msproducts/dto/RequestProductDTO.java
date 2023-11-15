@@ -1,17 +1,18 @@
 package com.compassuol.sp.challenge.msproducts.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
 
-@Getter
-@Setter
+@Data
 @Validated
 @AllArgsConstructor
-public class ProductDTO {
+public class RequestProductDTO {
 
     @NotEmpty(message = "field 'name' is mandatory")
     String name;

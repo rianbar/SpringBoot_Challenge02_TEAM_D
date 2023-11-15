@@ -1,124 +1,111 @@
 package com.compassuol.sp.challenge.msproducts.service;
 
-import com.compassuol.sp.challenge.msproducts.controller.exception.errorTypes.ProductNotFoundException;
+import com.compassuol.sp.challenge.msproducts.dto.RequestProductDTO;
+import com.compassuol.sp.challenge.msproducts.dto.ResponseProductDTO;
+import com.compassuol.sp.challenge.msproducts.exception.type.BusinessErrorException;
+import com.compassuol.sp.challenge.msproducts.exception.type.ProductNotFoundException;
 import com.compassuol.sp.challenge.msproducts.model.ProductModel;
 import com.compassuol.sp.challenge.msproducts.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.compassuol.sp.challenge.msproducts.constants.ProductsConstants.VALID_PRODUCT;
-import static com.compassuol.sp.challenge.msproducts.constants.ProductsConstants.VALID_PRODUCT_DTO;
-import static com.compassuol.sp.challenge.msproducts.constants.ProductsConstants.INVALID_PRODUCT;
-import static com.compassuol.sp.challenge.msproducts.constants.ProductsConstants.INVALID_PRODUCT_DTO;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class ProductServiceTest {
-
-    @Mock
-    private ProductRepository productRepository;
+class ProductServiceTest {
+    ProductModel model;
+    RequestProductDTO request;
+    ResponseProductDTO response;
 
     @InjectMocks
-    private ProductService productService;
+    ProductService service;
+
+    @Mock
+    ProductRepository repository;
+
+    @Mock
+    TransferObjectService transferObject;
 
     @BeforeEach
-    public void setUp() {
-        // Configurar o comportamento simulado do repositório
-        List<ProductModel> products = new ArrayList<>();
-        products.add(new ProductModel("name1", "Product 1", 10.0));
-        products.add(new ProductModel("name2", "Product 2", 20.0));
-
-        when(productRepository.findAll()).thenReturn(products);
+    void setUp() {
+        model = new ProductModel(1L, "product", "this is my mock description", 12.50);
+        request = new RequestProductDTO("product", "this is my mock description", 12.50);
+        response = new ResponseProductDTO(1L,"product", "this is my mock description", 12.50);
     }
 
     @Test
-    public void testGetAllProducts() {
-        List<ProductModel> products = productService.getAllProducts();
+    void updateProduct_withValidData_returnObject() {
+        var productModelCaptor = ArgumentCaptor.forClass(ProductModel.class);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(model));
+        when(transferObject.toDTO(productModelCaptor.capture())).thenReturn(response);
 
-        // Verificar se a lista de produtos não está vazia
-        assertEquals(2, products.size());
+        var response = service.updateProductService(request, 1L);
 
-        // Verificar se os detalhes dos produtos correspondem aos dados simulados
-        assertEquals("name1", products.get(0).getName());
-        assertEquals(10.0, products.get(0).getValue());
-        assertEquals("name2", products.get(1).getName());
-        assertEquals(20.0, products.get(1).getValue());
+        assertNotNull(response);
     }
 
     @Test
-    public void updateProduct_withValidData_ReturnsProduct() {
-        when(productRepository.save(VALID_PRODUCT)).thenReturn(VALID_PRODUCT);
-        ProductModel product = productService.updateProductService(VALID_PRODUCT, VALID_PRODUCT_DTO);
-        assertEquals(VALID_PRODUCT, product);
+    void updateProduct_withInvalidData_ThrowException() {
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateProductService(request, 1L))
+                .isInstanceOf(ProductNotFoundException.class);
     }
 
     @Test
-    public void updateProduct_withInvalidData_ReturnsNull() {
-        when(productRepository.save(INVALID_PRODUCT)).thenReturn(null);
-        ProductModel product = productService.updateProductService(INVALID_PRODUCT, INVALID_PRODUCT_DTO);
-        assertNull(product);
+    void findProductById_withValidData_returnObject() {
+        var productModelCaptor = ArgumentCaptor.forClass(ProductModel.class);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(model));
+        when(transferObject.toDTO(productModelCaptor.capture())).thenReturn(response);
+
+        var response = service.findProductByIdService(1L);
+
+        assertNotNull(response);
     }
 
     @Test
-    public void testDeleteProductById() {
-        long productId = 1;
-        ProductModel product = new ProductModel();
-        product.setId(productId);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+    void findProductById_withinValidData_throwException() {
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
-        productService.deleteProductById(productId);
-
-        verify(productRepository, times(1)).findById(productId);
-        verify(productRepository, times(1)).delete(product);
+        assertThatThrownBy(() -> service.findProductByIdService(1L))
+                .isInstanceOf(ProductNotFoundException.class);
     }
 
     @Test
-    public void testDeleteProductByIdNotFound() {
-        long productId = 1;
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+    void deleteProduct_withInvalidData_throwException() {
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Use uma expressão lambda para capturar a exceção lançada
-        org.junit.jupiter.api.Assertions.assertThrows(ProductNotFoundException.class, () -> {
-        productService.deleteProductById(productId);});
+        assertThatThrownBy(() -> service.deleteProductById(1L))
+                .isInstanceOf(ProductNotFoundException.class);
     }
 
     @Test
-    public void testIsProductExistsByName_Exists() {
-        String existingProductName = "ExistingProduct";
-        when(productRepository.existsByName(existingProductName)).thenReturn(true);
+    void createProduct_withValidData_returnObject() {
+        var productModelCaptor = ArgumentCaptor.forClass(ProductModel.class);
+        when(repository.findByName(anyString())).thenReturn(Optional.empty());
+        when(repository.save(productModelCaptor.capture())).thenReturn(model);
+        when(transferObject.toDTO(productModelCaptor.capture())).thenReturn(response);
 
-        boolean result = productService.isProductExistsByName(existingProductName);
+        var response = service.createProductService(request);
 
-        assertTrue(result);
+        assertNotNull(response);
     }
 
     @Test
-    public void testIsProductExistsByName_NotExists() {
-        String nonExistingProductName = "NonExistingProduct";
-        when(productRepository.existsByName(nonExistingProductName)).thenReturn(false);
+    void createProduct_withInvalidData_throwException() {
+        when(repository.findByName(anyString())).thenReturn(Optional.of(model));
 
-        boolean result = productService.isProductExistsByName(nonExistingProductName);
-
-        assertFalse(result);
+        assertThatThrownBy(() ->  service.createProductService(request))
+                .isInstanceOf(BusinessErrorException.class);
     }
-
-    @Test
-    public void testCreateProductService() {
-        ProductModel productModel = new ProductModel("New Product", "New Product Description", 10.0);
-        when(productRepository.save(productModel)).thenReturn(productModel);
-
-        ProductModel result = productService.createProductService(productModel);
-
-        // Verifique se o método de serviço retornou o produto esperado
-        assertEquals(productModel, result);
-    }
-
 }

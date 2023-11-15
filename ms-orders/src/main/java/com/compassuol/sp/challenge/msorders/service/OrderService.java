@@ -28,7 +28,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductsProxy proxy;
     private final ViaCepProxy viaCepProxy;
-    private final ParseToDTO parseToDTO;
 
     public List<OrderModel> getOrdersByStatusSortedByDate(StatusOrderEnum status) {
         if (status == null) {
