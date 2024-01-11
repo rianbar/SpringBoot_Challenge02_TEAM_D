@@ -20,11 +20,11 @@ public class FeedbackModel {
     private ScaleEnum scale;
     private String comment;
     @Column(nullable = false)
-    private Long order_id;
+    private Long orderId;
 
-    public FeedbackModel(ScaleEnum scale, String comment, Long order_id) {
+    public FeedbackModel(ScaleEnum scale, String comment, Long orderId) {
         this.scale = scale;
         this.comment = comment;
-        this.order_id = order_id;
+        this.orderId = orderId;
     }
 }

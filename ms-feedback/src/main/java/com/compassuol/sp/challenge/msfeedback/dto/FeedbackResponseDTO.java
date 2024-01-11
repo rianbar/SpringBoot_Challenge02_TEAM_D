@@ -14,12 +14,12 @@ public class FeedbackResponseDTO {
     private Long id;
     private ScaleEnum scale;
     private String comment;
-    private Long order_id;
+    private Long orderId;
 
     public FeedbackResponseDTO(FeedbackModel model) {
         this.id = model.getId();
         this.scale = model.getScale();
         this.comment = model.getComment();
-        this.order_id = model.getOrder_id();
+        this.orderId = model.getOrderId();
     }
 }

@@ -1,8 +1,8 @@
-package com.compassuol.sp.challenge.msfeedback.controller.exception;
+package com.compassuol.sp.challenge.msfeedback.exception;
 
-import com.compassuol.sp.challenge.msfeedback.controller.exception.errorTypes.BusinessErrorException;
-import com.compassuol.sp.challenge.msfeedback.controller.exception.errorTypes.FeedbackNotFoundException;
-import com.compassuol.sp.challenge.msfeedback.controller.exception.errorTypes.OrderCancellationNotAllowedException;
+import com.compassuol.sp.challenge.msfeedback.errors.BusinessErrorException;
+import com.compassuol.sp.challenge.msfeedback.errors.FeedbackNotFoundException;
+import com.compassuol.sp.challenge.msfeedback.errors.OrderCancellationNotAllowedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
