@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "feign-cep", url = "http://viacep.com.br/ws")
 public interface ViaCepProxy {
     @GetMapping("/{postalCode}/json/")
-    public ViaCepAddressDTO getViaCepAddress(@PathVariable("postalCode") String postalCode);
+    ViaCepAddressDTO getViaCepAddress(@PathVariable("postalCode") String postalCode);
 }

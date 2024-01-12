@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "ms-products", url = "localhost:8080")
 public interface ProductsProxy {
     @GetMapping("/products/{productId}")
-    public ProductModelDTO getProductById(@PathVariable Long productId);
+    ProductModelDTO getProductById(@PathVariable Long productId);
 }

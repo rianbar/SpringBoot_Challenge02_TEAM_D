@@ -1,9 +1,7 @@
 package com.compassuol.sp.challenge.msorders.controller;
 
 import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.ProductNotFoundException;
 import com.compassuol.sp.challenge.msorders.dto.CancelOrderRequestDTO;
-import com.compassuol.sp.challenge.msorders.dto.CreateOrderResponseDTO;
 import com.compassuol.sp.challenge.msorders.dto.RequestOrderDTO;
 import com.compassuol.sp.challenge.msorders.model.OrderModel;
 import com.compassuol.sp.challenge.msorders.service.OrderService;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -24,7 +21,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // http://localhost:8000/orders?status=CONFIRMED
     @GetMapping
     public ResponseEntity<List<OrderModel>> getOrdersByStatusAndSort(
             @RequestParam(name = "status", required = false) StatusOrderEnum status) {
@@ -32,34 +28,22 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
-        if (id <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de pedido inválido.");
-        }
-
-        Optional<OrderModel> order = orderService.findBy(id);
-        if (order.isPresent()) {
-            return ResponseEntity.ok(order.get());
-        } else {
-            throw new ProductNotFoundException("Pedido com ID " + id + " não encontrado.");
-        }
+    public ResponseEntity<Object> getOrderById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findByIdService(id));
     }
 
     @PostMapping
     public ResponseEntity<Object> createOrder(@RequestBody @Valid RequestOrderDTO request) {
-        var response = orderService.createOrderService(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrderService(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderModel> updateOrder(@PathVariable Long id, @RequestBody @Valid RequestOrderDTO request) {
-        var response = orderService.updateOrderService(id, request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody @Valid RequestOrderDTO request) {
+        return ResponseEntity.ok(orderService.updateOrderService(id, request));
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<OrderModel> cancelOrderById(@PathVariable Long id, @RequestBody CancelOrderRequestDTO cancelOrderRequest) {
-        var canceledOrder = orderService.cancelOrderByIdService(id, cancelOrderRequest);
-        return ResponseEntity.ok(canceledOrder);
+    public ResponseEntity<Object> cancelOrderById(@PathVariable Long id, @RequestBody CancelOrderRequestDTO cancelOrderRequest) {
+        return ResponseEntity.ok(orderService.cancelOrderByIdService(id, cancelOrderRequest));
     }
 }

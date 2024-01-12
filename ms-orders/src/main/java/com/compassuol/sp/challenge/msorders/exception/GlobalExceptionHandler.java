@@ -1,8 +1,8 @@
-package com.compassuol.sp.challenge.msorders.controller.exception;
+package com.compassuol.sp.challenge.msorders.exception;
 
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.BusinessErrorException;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.OrderCancellationNotAllowedException;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.ProductNotFoundException;
+import com.compassuol.sp.challenge.msorders.errors.BusinessErrorException;
+import com.compassuol.sp.challenge.msorders.errors.OrderCancelNotAllowedException;
+import com.compassuol.sp.challenge.msorders.errors.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(OrderCancellationNotAllowedException.class)
-    public ResponseEntity<ResponseErrorTemplate> handleOrderCancellationNotAllowedException(OrderCancellationNotAllowedException ex) {
+    @ExceptionHandler(OrderCancelNotAllowedException.class)
+    public ResponseEntity<ResponseErrorTemplate> handleOrderCancellationNotAllowedException(OrderCancelNotAllowedException ex) {
         int errorCode = HttpStatus.BAD_REQUEST.value();
         String statusCode = HttpStatus.BAD_REQUEST.toString();
         String message = ex.getMessage();

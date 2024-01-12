@@ -1,10 +1,10 @@
 package com.compassuol.sp.challenge.msorders.service;
 
 import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.BusinessErrorException;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.OrderCancellationNotAllowedException;
-import com.compassuol.sp.challenge.msorders.controller.exception.errorTypes.OrderNotFoundException;
 import com.compassuol.sp.challenge.msorders.dto.*;
+import com.compassuol.sp.challenge.msorders.errors.BusinessErrorException;
+import com.compassuol.sp.challenge.msorders.errors.OrderCancelNotAllowedException;
+import com.compassuol.sp.challenge.msorders.errors.OrderNotFoundException;
 import com.compassuol.sp.challenge.msorders.model.AddressModel;
 import com.compassuol.sp.challenge.msorders.model.OrderModel;
 import com.compassuol.sp.challenge.msorders.model.OrderProductsModel;
@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +28,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductsProxy proxy;
     private final ViaCepProxy viaCepProxy;
+    private final TransferObjects transferObjects;
 
     public List<OrderModel> getOrdersByStatusSortedByDate(StatusOrderEnum status) {
         if (status == null) {
@@ -36,15 +37,17 @@ public class OrderService {
         return orderRepository.findOrdersByStatusAndCreateDateDesc(status);
     }
 
-    public Optional<OrderModel> findBy(Long id) {
-        return orderRepository.findById(id);
+    public Optional<OrderModel> findByIdService(Long id) {
+        var order = orderRepository.findById(id);
+        if (order.isEmpty()) throw new OrderNotFoundException("order doesn't exists");
+        return order;
     }
 
     public CreateOrderResponseDTO createOrderService(RequestOrderDTO request) {
         double subtotalValue = 0.0;
         for (OrderProductsModel productsModel : request.getProducts()) {
             try {
-                ProductModelDTO product = proxy.getProductById(productsModel.getProduct_id());
+                ProductModelDTO product = proxy.getProductById(productsModel.getProductId());
                 subtotalValue += productsModel.getQuantity() * product.getValue();
             } catch (FeignException ex) {
                 throw new BusinessErrorException("cannot find product id or your connection with" +
@@ -53,74 +56,44 @@ public class OrderService {
         }
         try {
             ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
-            AddressModel address = getAddressModel(request, cep);
-            OrderModel order = getOrderModel(request, address, subtotalValue);
-            OrderModel model = orderRepository.save(order);
-            return new CreateOrderResponseDTO(model);
+            AddressModel address = transferObjects.fillAddressModel(request, cep);
+            OrderModel order = transferObjects.fillOrderObject(request, address, subtotalValue);
+            return new CreateOrderResponseDTO(orderRepository.save(order));
         } catch (ParseException ex) {
             throw new RuntimeException();
         }
     }
 
     public OrderModel cancelOrderByIdService(Long id, CancelOrderRequestDTO cancelOrderRequest) {
-        return orderRepository.findById(id)
-                .map(order -> {
-                    if (order.getStatus() == StatusOrderEnum.SENT) {
-                        throw new OrderCancellationNotAllowedException("O pedido não pode ser cancelado, pois já foi enviado.");
-                    }
-                    LocalDateTime currentDateTime = LocalDateTime.now();
-                    if (order.getCreate_date() != null) {
-                        long daysBetween = ChronoUnit.DAYS.between(order.getCreate_date().toLocalDate(), currentDateTime);
-                        if (daysBetween > 90) {
-                            throw new OrderCancellationNotAllowedException("O pedido não pode ser cancelado, pois tem mais de 90 dias de criação.");
-                        }
-                    } else {
-                        throw new OrderCancellationNotAllowedException("A data de criação do pedido é nula.");
-                    }
-                    order.setStatus(StatusOrderEnum.CANCELED);
-                    order.setCancel_reason(cancelOrderRequest.getCancelReason());
-                    order.setCancel_date(currentDateTime);
-                    order.setSubtotal_value(order.getSubtotal_value());
-                    return orderRepository.save(order);
-                })
-                .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado"));
+
+        var order = orderRepository.findById(id);
+        long daysBetween;
+        if (order.isPresent()) {
+            if (order.get().getStatus() == StatusOrderEnum.SENT) {
+                throw new OrderCancelNotAllowedException("order cannot be canceled, because it has already been sent");}
+
+            daysBetween = Duration.between(order.get().getCreateDate(), LocalDateTime.now()).toDays();
+            if (daysBetween > 90) throw new
+                    OrderCancelNotAllowedException("order cannot be canceled because the time has been exceeded 90 days");
+
+            order.get().setStatus(StatusOrderEnum.CANCELED);
+            order.get().setCancelDate(LocalDateTime.now());
+            order.get().setCancelReason(cancelOrderRequest.getCancelReason());
+        }
+
+        return orderRepository.save(order.get());
     }
 
     public OrderModel updateOrderService(Long id, RequestOrderDTO request) {
         OrderModel order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado"));
+                .orElseThrow(() -> new OrderNotFoundException("order not found"));
 
         if (order.getStatus() == StatusOrderEnum.CANCELED)
-            throw new BusinessErrorException("pedido com status de cancelado não pode ser atualizado.");
+            throw new BusinessErrorException("order with status 'canceled' cannot be updated.");
 
         ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
-        OrderModel updateOrder = setOrderUpdates(order,request,cep);
+        OrderModel updateOrder = transferObjects.updateOrderObject(order,request,cep);
         updateOrder.setStatus(StatusOrderEnum.SENT);
         return orderRepository.save(updateOrder);
-    }
-
-    private AddressModel getAddressModel(RequestOrderDTO request, ViaCepAddressDTO cep) {
-        return AddressModel.builder()
-                .number(request.getAddress().getNumber())
-                .complement(cep.getComplemento())
-                .city(cep.getLocalidade())
-                .state(cep.getUf())
-                .postalCode(cep.getCep())
-                .street(request.getAddress().getStreet())
-                .build();
-    }
-
-    private OrderModel getOrderModel(RequestOrderDTO request, AddressModel address, double subtotal)
-            throws ParseException {
-        return new OrderModel(request.getProducts(), address, request.getPayment_method(),
-                subtotal, StatusOrderEnum.CONFIRMED, "");
-    }
-
-    private OrderModel setOrderUpdates(OrderModel order, RequestOrderDTO request, ViaCepAddressDTO cep) {
-        order.setPayment_method(request.getPayment_method());
-        AddressModel address = getAddressModel(request, cep);
-        order.setAddress(address);
-        order.setProducts(request.getProducts());
-        return order;
     }
 }

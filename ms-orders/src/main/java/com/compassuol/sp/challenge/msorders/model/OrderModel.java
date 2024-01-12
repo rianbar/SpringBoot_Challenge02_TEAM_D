@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -33,36 +34,36 @@ public class OrderModel {
     @JoinColumn(name = "foreign_address_id")
     private AddressModel address;
     @Enumerated(EnumType.STRING)
-    private PaymentTypeEnum payment_method;
-    private Double subtotal_value;
+    private PaymentTypeEnum paymentMethod;
+    private Double subtotalValue;
     private Double discount;
-    private Double total_value;
+    private Double totalValue;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(name = "create_date")
-    private LocalDateTime create_date;
+    private LocalDateTime createDate;
     @Enumerated(EnumType.STRING)
     private StatusOrderEnum status;
-    private String cancel_reason;
+    private String cancelReason;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime cancel_date;
+    private LocalDateTime cancelDate;
 
     public OrderModel(List<OrderProductsModel> products, AddressModel address,
-                      PaymentTypeEnum payment_method, Double subtotal_value,
-                      StatusOrderEnum status, String cancel_reason) throws ParseException {
-        HashMap<String, Double> checkPromo = new OrderDataConstraints().checkPromotion(payment_method, subtotal_value);
+                      PaymentTypeEnum paymentMethod, Double subtotalValue,
+                      StatusOrderEnum status, String cancelReason) throws ParseException {
+        Map<String, Double> checkPromo = new OrderDataConstraints().checkPromotion(paymentMethod, subtotalValue);
         this.products = products;
         this.address = address;
-        this.payment_method = payment_method;
-        this.subtotal_value = new OrderDataConstraints().FormatDoubles(subtotal_value);
+        this.paymentMethod = paymentMethod;
+        this.subtotalValue = new OrderDataConstraints().formatDoubles(subtotalValue);
         this.status = status;
-        this.cancel_reason = cancel_reason;
-        this.create_date = LocalDateTime.now();
+        this.cancelReason = cancelReason;
+        this.createDate = LocalDateTime.now();
         this.discount = checkPromo.get("discount");
-        this.total_value = checkPromo.get("total_value");
+        this.totalValue = checkPromo.get("total_value");
 
-        if (!this.cancel_reason.isEmpty()) {
-            this.cancel_date = LocalDateTime.now();
+        if (!this.cancelReason.isEmpty()) {
+            this.cancelDate = LocalDateTime.now();
             this.status = StatusOrderEnum.CANCELED;
         }
     }

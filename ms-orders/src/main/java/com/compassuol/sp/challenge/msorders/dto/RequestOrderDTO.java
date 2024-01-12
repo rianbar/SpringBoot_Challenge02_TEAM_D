@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class RequestOrderDTO {
 
     @NotNull(message = "products field cannot be null")
@@ -27,8 +29,5 @@ public class RequestOrderDTO {
     private AddressRequestDTO address;
     @NotNull(message = "payment method field cannot be null")
     @Enumerated(EnumType.STRING)
-    private PaymentTypeEnum payment_method;
-    public RequestOrderDTO() {
-
-    }
+    private PaymentTypeEnum paymentMethod;
 }

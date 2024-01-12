@@ -1,7 +1,9 @@
-package com.compassuol.sp.challenge.msorders.controller.exception;
+package com.compassuol.sp.challenge.msorders.exception;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class ResponseErrorTemplate {
 
@@ -12,18 +14,6 @@ public class ResponseErrorTemplate {
     public ResponseErrorTemplate(int code, String status, String message) {
         this.code = code;
         this.status = status;
-        this.message = message;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
     }
 }

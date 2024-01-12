@@ -14,7 +14,7 @@ import lombok.Setter;
 @Embeddable
 public class OrderProductsModel {
     @NotNull(message = "product_id field cannot be null")
-    private Long product_id;
+    private Long productId;
     @NotNull(message = "quantity field cannot be null")
     private Long quantity;
 }

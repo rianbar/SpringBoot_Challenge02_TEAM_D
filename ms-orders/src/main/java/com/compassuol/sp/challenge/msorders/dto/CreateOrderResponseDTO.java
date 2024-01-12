@@ -21,10 +21,10 @@ public class CreateOrderResponseDTO {
     private Long id;
     private List<OrderProductsModel> products;
     private AddressModel address;
-    private PaymentTypeEnum payment_method;
-    private Double subtotal_value;
+    private PaymentTypeEnum paymentMethod;
+    private Double subtotalValue;
     private Double discount;
-    private Double total_value;
+    private Double totalValue;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("create_date")
     private LocalDateTime createDateTime;
@@ -34,10 +34,10 @@ public class CreateOrderResponseDTO {
         this.id = order.getId();
         this.products = order.getProducts();
         this.address = order.getAddress();
-        this.payment_method = order.getPayment_method();
-        this.subtotal_value = order.getSubtotal_value();
+        this.paymentMethod = order.getPaymentMethod();
+        this.subtotalValue = order.getSubtotalValue();
         this.discount = order.getDiscount();
-        this.total_value = order.getTotal_value();
+        this.totalValue = order.getTotalValue();
         this.createDateTime = LocalDateTime.now();
         this.status = order.getStatus();
     }
