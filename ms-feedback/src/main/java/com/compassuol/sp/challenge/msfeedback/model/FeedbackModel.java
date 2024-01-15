@@ -19,7 +19,7 @@ public class FeedbackModel {
     @Enumerated(EnumType.STRING)
     private ScaleEnum scale;
     private String comment;
-    @Column(nullable = false)
+    @Column(name = "order_id", nullable = false)
     private Long orderId;
 
     public FeedbackModel(ScaleEnum scale, String comment, Long orderId) {

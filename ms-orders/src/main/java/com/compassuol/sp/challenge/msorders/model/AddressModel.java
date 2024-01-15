@@ -27,5 +27,6 @@ public class AddressModel {
     private String city;
     private String state;
     @NotEmpty(message = "postalCode cannot be empty")
+    @Column(name = "postal_code")
     private String postalCode;
 }

@@ -88,8 +88,8 @@ public class OrderService {
         OrderModel order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("order not found"));
 
-        if (order.getStatus() == StatusOrderEnum.CANCELED)
-            throw new BusinessErrorException("order with status 'canceled' cannot be updated.");
+        if (order.getStatus() == StatusOrderEnum.CANCELED || order.getStatus() == StatusOrderEnum.SENT)
+            throw new BusinessErrorException("order with status 'canceled' or 'sent' cannot be updated.");
 
         ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
         OrderModel updateOrder = transferObjects.updateOrderObject(order,request,cep);

@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "ms-orders", url = "localhost:8000")
 public interface OrdersProxy {
     @GetMapping("/orders/{id}")
-    public OrderResponseDTO getOrderById(@PathVariable Long id);
+    OrderResponseDTO getOrderById(@PathVariable Long id);
 }

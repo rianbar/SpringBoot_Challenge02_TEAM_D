@@ -34,9 +34,12 @@ public class OrderModel {
     @JoinColumn(name = "foreign_address_id")
     private AddressModel address;
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private PaymentTypeEnum paymentMethod;
+    @Column(name = "subtotal_value")
     private Double subtotalValue;
     private Double discount;
+    @Column(name = "total_value")
     private Double totalValue;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -44,8 +47,10 @@ public class OrderModel {
     private LocalDateTime createDate;
     @Enumerated(EnumType.STRING)
     private StatusOrderEnum status;
+    @Column(name = "cancel_reason")
     private String cancelReason;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
 
     public OrderModel(List<OrderProductsModel> products, AddressModel address,
