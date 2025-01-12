@@ -1,11 +1,13 @@
 package com.compassuol.sp.challenge.msproducts.service;
 
-import com.compassuol.sp.challenge.msproducts.dto.RequestProductDTO;
-import com.compassuol.sp.challenge.msproducts.dto.ResponseProductDTO;
-import com.compassuol.sp.challenge.msproducts.exception.type.BusinessErrorException;
-import com.compassuol.sp.challenge.msproducts.exception.type.ProductNotFoundException;
-import com.compassuol.sp.challenge.msproducts.model.ProductModel;
+import com.compassuol.sp.challenge.msproducts.exception.ProductNotFoundException;
+import com.compassuol.sp.challenge.msproducts.mapper.ProductMapper;
+import com.compassuol.sp.challenge.msproducts.exception.BusinessRuleException;
+import com.compassuol.sp.challenge.msproducts.model.Product;
+import com.compassuol.sp.challenge.msproducts.model.request.ProductRequest;
+import com.compassuol.sp.challenge.msproducts.model.response.ProductResponse;
 import com.compassuol.sp.challenge.msproducts.repository.ProductRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,35 +18,37 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository productRepository;
-    private final TransferObjectService transferObject;
+  private final ProductRepository repository;
+  private final ProductMapper mapper;
 
-    public List<ProductModel> getAllProducts() {
-        return productRepository.findAll();
-    }
+  public List<Product> getAllProducts() {
+    return repository.findAll();
+  }
 
-    public ResponseProductDTO updateProductService(RequestProductDTO dto, long id) {
-        if (productRepository.findById(id).isEmpty()) throw new ProductNotFoundException("Product not found");
-        var model = productRepository.save(transferObject.toModelUpdated(id, dto));
-        return transferObject.toDTO(model);
-    }
+  public ProductResponse createProductService(ProductRequest request) {
+    var product = repository.findByName(request.name());
+    if (product.isPresent()) throw new BusinessRuleException();
+    var newProduct = repository.save(mapper.toProduct(request));
+    return mapper.toResponse(newProduct);
+  }
 
-    public ResponseProductDTO findProductByIdService(long id) {
-        Optional<ProductModel> product = productRepository.findById(id);
-        if (product.isEmpty()) throw new ProductNotFoundException("Product Not Found");
-        return transferObject.toDTO(product.get());
-    }
+  //find a way to mapper the product introducing the id
+  public ProductResponse updateProductService(ProductRequest request, long id) {
+    if (repository.findById(id).isEmpty()) throw new ProductNotFoundException();
+    var builder = Product.builder().id(id).name(request.name()).description(request.description()).price(request.price()).build();
+    var product = repository.save(builder);
+    return mapper.toResponse(product);
+  }
 
-    public void deleteProductById(long id) {
-        var findProduct = productRepository.findById(id);
-        if (findProduct.isEmpty()) throw new ProductNotFoundException("Product not found " + id);
-        productRepository.delete(findProduct.get());
-    }
+  public ProductResponse findProductByIdService(long id) {
+    Optional<Product> product = repository.findById(id);
+    if (product.isEmpty()) throw new ProductNotFoundException();
+    return mapper.toResponse(product.get());
+  }
 
-    public ResponseProductDTO createProductService(RequestProductDTO dto) {
-        if (productRepository.findByName(dto.getName()).isPresent())
-            throw new BusinessErrorException("Product name already exists");
-        var newProduct = productRepository.save(transferObject.toModel(dto));
-        return transferObject.toDTO(newProduct);
-    }
+  public void deleteProductById(long id) {
+    var product = repository.findById(id);
+    if (product.isEmpty()) throw new ProductNotFoundException();
+    repository.delete(product.get());
+  }
 }
