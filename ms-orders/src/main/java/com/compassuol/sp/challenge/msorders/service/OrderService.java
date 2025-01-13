@@ -1,7 +1,11 @@
 package com.compassuol.sp.challenge.msorders.service;
 
-import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
-import com.compassuol.sp.challenge.msorders.dto.*;
+import com.compassuol.sp.challenge.msorders.constant.Status;
+import com.compassuol.sp.challenge.msorders.dto.CancelOrderRequestDTO;
+import com.compassuol.sp.challenge.msorders.dto.CreateOrderResponseDTO;
+import com.compassuol.sp.challenge.msorders.dto.ProductModelDTO;
+import com.compassuol.sp.challenge.msorders.dto.RequestOrderDTO;
+import com.compassuol.sp.challenge.msorders.dto.ViaCepAddressDTO;
 import com.compassuol.sp.challenge.msorders.errors.BusinessErrorException;
 import com.compassuol.sp.challenge.msorders.errors.OrderCancelNotAllowedException;
 import com.compassuol.sp.challenge.msorders.errors.OrderNotFoundException;
@@ -30,20 +34,20 @@ public class OrderService {
     private final ViaCepProxy viaCepProxy;
     private final TransferObjects transferObjects;
 
-    public List<OrderModel> getOrdersByStatusSortedByDate(StatusOrderEnum status) {
+    public List<OrderModel> getOrdersByStatus(Status status) {
         if (status == null) {
             return orderRepository.findOrdersByCreateDateDesc();
         }
         return orderRepository.findOrdersByStatusAndCreateDateDesc(status);
     }
 
-    public Optional<OrderModel> findByIdService(Long id) {
+    public Optional<OrderModel> findById(Long id) {
         var order = orderRepository.findById(id);
         if (order.isEmpty()) throw new OrderNotFoundException("order doesn't exists");
         return order;
     }
 
-    public CreateOrderResponseDTO createOrderService(RequestOrderDTO request) {
+    public CreateOrderResponseDTO createOrder(RequestOrderDTO request) {
         double subtotalValue = 0.0;
         for (OrderProductsModel productsModel : request.getProducts()) {
             try {
@@ -64,19 +68,19 @@ public class OrderService {
         }
     }
 
-    public OrderModel cancelOrderByIdService(Long id, CancelOrderRequestDTO cancelOrderRequest) {
+    public OrderModel cancelOrderById(Long id, CancelOrderRequestDTO cancelOrderRequest) {
 
         var order = orderRepository.findById(id);
         long daysBetween;
         if (order.isPresent()) {
-            if (order.get().getStatus() == StatusOrderEnum.SENT) {
+            if (order.get().getStatus() == Status.SENT) {
                 throw new OrderCancelNotAllowedException("order cannot be canceled, because it has already been sent");}
 
             daysBetween = Duration.between(order.get().getCreateDate(), LocalDateTime.now()).toDays();
             if (daysBetween > 90) throw new
                     OrderCancelNotAllowedException("order cannot be canceled because the time has been exceeded 90 days");
 
-            order.get().setStatus(StatusOrderEnum.CANCELED);
+            order.get().setStatus(Status.CANCELED);
             order.get().setCancelDate(LocalDateTime.now());
             order.get().setCancelReason(cancelOrderRequest.getCancelReason());
         }
@@ -84,16 +88,16 @@ public class OrderService {
         return orderRepository.save(order.get());
     }
 
-    public OrderModel updateOrderService(Long id, RequestOrderDTO request) {
+    public OrderModel updateOrder(Long id, RequestOrderDTO request) {
         OrderModel order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("order not found"));
 
-        if (order.getStatus() == StatusOrderEnum.CANCELED || order.getStatus() == StatusOrderEnum.SENT)
+        if (order.getStatus() == Status.CANCELED || order.getStatus() == Status.SENT)
             throw new BusinessErrorException("order with status 'canceled' or 'sent' cannot be updated.");
 
         ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
         OrderModel updateOrder = transferObjects.updateOrderObject(order,request,cep);
-        updateOrder.setStatus(StatusOrderEnum.SENT);
+        updateOrder.setStatus(Status.SENT);
         return orderRepository.save(updateOrder);
     }
 }

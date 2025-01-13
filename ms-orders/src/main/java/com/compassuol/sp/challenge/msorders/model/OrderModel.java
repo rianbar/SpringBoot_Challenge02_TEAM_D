@@ -1,7 +1,7 @@
 package com.compassuol.sp.challenge.msorders.model;
 
-import com.compassuol.sp.challenge.msorders.constant.PaymentTypeEnum;
-import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
+import com.compassuol.sp.challenge.msorders.constant.PaymentType;
+import com.compassuol.sp.challenge.msorders.constant.Status;
 import com.compassuol.sp.challenge.msorders.service.OrderDataConstraints;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class OrderModel {
     private AddressModel address;
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
-    private PaymentTypeEnum paymentMethod;
+    private PaymentType paymentMethod;
     @Column(name = "subtotal_value")
     private Double subtotalValue;
     private Double discount;
@@ -45,7 +45,7 @@ public class OrderModel {
     @Column(name = "create_date")
     private LocalDateTime createDate;
     @Enumerated(EnumType.STRING)
-    private StatusOrderEnum status;
+    private Status status;
     @Column(name = "cancel_reason")
     private String cancelReason;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -53,8 +53,8 @@ public class OrderModel {
     private LocalDateTime cancelDate;
 
     public OrderModel(List<OrderProductsModel> products, AddressModel address,
-                      PaymentTypeEnum paymentMethod, Double subtotalValue,
-                      StatusOrderEnum status, String cancelReason) throws ParseException {
+                      PaymentType paymentMethod, Double subtotalValue,
+                      Status status, String cancelReason) throws ParseException {
         Map<String, Double> checkPromo = new OrderDataConstraints().checkPromotion(paymentMethod, subtotalValue);
         this.products = products;
         this.address = address;
@@ -68,7 +68,7 @@ public class OrderModel {
 
         if (!this.cancelReason.isEmpty()) {
             this.cancelDate = LocalDateTime.now();
-            this.status = StatusOrderEnum.CANCELED;
+            this.status = Status.CANCELED;
         }
     }
 }

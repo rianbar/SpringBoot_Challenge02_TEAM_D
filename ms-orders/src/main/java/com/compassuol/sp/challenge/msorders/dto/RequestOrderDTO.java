@@ -1,6 +1,6 @@
 package com.compassuol.sp.challenge.msorders.dto;
 
-import com.compassuol.sp.challenge.msorders.constant.PaymentTypeEnum;
+import com.compassuol.sp.challenge.msorders.constant.PaymentType;
 import com.compassuol.sp.challenge.msorders.model.OrderProductsModel;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,5 +29,5 @@ public class RequestOrderDTO {
     private AddressRequestDTO address;
     @NotNull(message = "payment method field cannot be null")
     @Enumerated(EnumType.STRING)
-    private PaymentTypeEnum paymentMethod;
+    private PaymentType paymentMethod;
 }

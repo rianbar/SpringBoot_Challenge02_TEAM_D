@@ -1,6 +1,6 @@
 package com.compassuol.sp.challenge.msorders.service;
 
-import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
+import com.compassuol.sp.challenge.msorders.constant.Status;
 import com.compassuol.sp.challenge.msorders.dto.RequestOrderDTO;
 import com.compassuol.sp.challenge.msorders.dto.ViaCepAddressDTO;
 import com.compassuol.sp.challenge.msorders.model.AddressModel;
@@ -28,7 +28,7 @@ public class TransferObjects {
     public OrderModel fillOrderObject(RequestOrderDTO request, AddressModel address, double subtotal)
             throws ParseException {
         return new OrderModel(request.getProducts(), address, request.getPaymentMethod(),
-                subtotal, StatusOrderEnum.CONFIRMED, "");
+                subtotal, Status.CONFIRMED, "");
     }
 
     public OrderModel updateOrderObject(OrderModel order, RequestOrderDTO request, ViaCepAddressDTO cep) {

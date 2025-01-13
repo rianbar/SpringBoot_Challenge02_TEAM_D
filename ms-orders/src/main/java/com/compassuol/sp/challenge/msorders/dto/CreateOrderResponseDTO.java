@@ -1,7 +1,7 @@
 package com.compassuol.sp.challenge.msorders.dto;
 
-import com.compassuol.sp.challenge.msorders.constant.PaymentTypeEnum;
-import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
+import com.compassuol.sp.challenge.msorders.constant.PaymentType;
+import com.compassuol.sp.challenge.msorders.constant.Status;
 import com.compassuol.sp.challenge.msorders.model.AddressModel;
 import com.compassuol.sp.challenge.msorders.model.OrderModel;
 import com.compassuol.sp.challenge.msorders.model.OrderProductsModel;
@@ -21,14 +21,14 @@ public class CreateOrderResponseDTO {
     private Long id;
     private List<OrderProductsModel> products;
     private AddressModel address;
-    private PaymentTypeEnum paymentMethod;
+    private PaymentType paymentMethod;
     private Double subtotalValue;
     private Double discount;
     private Double totalValue;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("create_date")
     private LocalDateTime createDateTime;
-    private StatusOrderEnum status;
+    private Status status;
 
     public CreateOrderResponseDTO(OrderModel order) {
         this.id = order.getId();

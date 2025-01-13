@@ -1,6 +1,6 @@
 package com.compassuol.sp.challenge.msorders.repository;
 
-import com.compassuol.sp.challenge.msorders.constant.StatusOrderEnum;
+import com.compassuol.sp.challenge.msorders.constant.Status;
 import com.compassuol.sp.challenge.msorders.model.OrderModel;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +15,5 @@ public interface OrderRepository extends JpaRepository<OrderModel, Long> {
     List<OrderModel> findOrdersByCreateDateDesc();
 
     @Query("SELECT o FROM OrderModel o WHERE o.status = :status ORDER BY o.createDate DESC")
-    List<OrderModel> findOrdersByStatusAndCreateDateDesc(@Param("status") StatusOrderEnum status);
+    List<OrderModel> findOrdersByStatusAndCreateDateDesc(@Param("status") Status status);
 }

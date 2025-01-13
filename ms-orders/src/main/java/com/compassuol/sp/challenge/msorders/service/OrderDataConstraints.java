@@ -1,6 +1,6 @@
 package com.compassuol.sp.challenge.msorders.service;
 
-import com.compassuol.sp.challenge.msorders.constant.PaymentTypeEnum;
+import com.compassuol.sp.challenge.msorders.constant.PaymentType;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -15,13 +15,13 @@ public class OrderDataConstraints {
         return decimalFormat.parse(stringDouble).doubleValue();
     }
 
-    public Map<String, Double> checkPromotion(PaymentTypeEnum paymentType, double subtotal)
+    public Map<String, Double> checkPromotion(PaymentType paymentType, double subtotal)
             throws ParseException {
         double percentage;
         double discount = 0.0;
         double totalValue;
 
-        if (paymentType == PaymentTypeEnum.PIX) {
+        if (paymentType == PaymentType.PIX) {
             discount = 0.05;
             percentage = subtotal*discount;
             totalValue = subtotal - percentage;
