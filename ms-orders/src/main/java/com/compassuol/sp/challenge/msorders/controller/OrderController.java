@@ -1,9 +1,10 @@
 package com.compassuol.sp.challenge.msorders.controller;
 
-import com.compassuol.sp.challenge.msorders.constant.Status;
-import com.compassuol.sp.challenge.msorders.dto.CancelOrderRequestDTO;
-import com.compassuol.sp.challenge.msorders.dto.RequestOrderDTO;
-import com.compassuol.sp.challenge.msorders.model.OrderModel;
+import com.compassuol.sp.challenge.msorders.constant.OrderStatus;
+import com.compassuol.sp.challenge.msorders.model.Order;
+import com.compassuol.sp.challenge.msorders.model.request.CancelOrderRequest;
+import com.compassuol.sp.challenge.msorders.model.request.CreateOrderRequest;
+import com.compassuol.sp.challenge.msorders.model.response.OrderResponse;
 import com.compassuol.sp.challenge.msorders.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -30,27 +31,29 @@ public class OrderController {
   private final OrderService service;
 
   @GetMapping
-  public ResponseEntity<List<OrderModel>> getOrdersByStatus(@RequestParam Status status) {
+  public ResponseEntity<List<Order>> getOrdersByStatus(@RequestParam OrderStatus status) {
     return ResponseEntity.status(HttpStatus.OK).body(service.getOrdersByStatus(status));
   }
 
+  /*
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Object> getOrderById(@PathVariable Long id) {
+  public ResponseEntity<OrderResponse> getOrderById(@PathVariable String id) {
     return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
   }
 
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Object> createOrder(@RequestBody @Valid RequestOrderDTO request) {
+  public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.createOrder(request));
   }
 
   @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody @Valid RequestOrderDTO request) {
+  public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id, @RequestBody CreateOrderRequest request) {
     return ResponseEntity.status(HttpStatus.OK).body(service.updateOrder(id, request));
   }
 
   @PostMapping(value = "/{id}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Object> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequestDTO cancelOrderRequest) {
-    return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrderById(id, cancelOrderRequest));
+  public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequest request) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrder(id, request));
   }
+    */
 }

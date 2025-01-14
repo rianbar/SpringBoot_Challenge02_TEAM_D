@@ -1,6 +1,6 @@
 package com.compassuol.sp.challenge.msorders.constant;
 
-public enum Status {
+public enum OrderStatus {
   CONFIRMED,
   SENT,
   CREATED,

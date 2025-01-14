@@ -1,19 +1,14 @@
 package com.compassuol.sp.challenge.msorders.repository;
 
-import com.compassuol.sp.challenge.msorders.constant.Status;
-import com.compassuol.sp.challenge.msorders.model.OrderModel;
-import feign.Param;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import com.compassuol.sp.challenge.msorders.constant.OrderStatus;
+import com.compassuol.sp.challenge.msorders.model.Order;
 
 import java.util.List;
 
-@Repository
-public interface OrderRepository extends JpaRepository<OrderModel, Long> {
-    @Query("SELECT o FROM OrderModel o ORDER BY o.createDate DESC")
-    List<OrderModel> findOrdersByCreateDateDesc();
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-    @Query("SELECT o FROM OrderModel o WHERE o.status = :status ORDER BY o.createDate DESC")
-    List<OrderModel> findOrdersByStatusAndCreateDateDesc(@Param("status") Status status);
+@Repository
+public interface OrderRepository extends MongoRepository<Order, String> {
+  List<Order> findByStatus(OrderStatus status);
 }

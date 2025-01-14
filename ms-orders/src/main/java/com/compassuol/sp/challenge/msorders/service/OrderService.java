@@ -1,103 +1,45 @@
 package com.compassuol.sp.challenge.msorders.service;
 
-import com.compassuol.sp.challenge.msorders.constant.Status;
-import com.compassuol.sp.challenge.msorders.dto.CancelOrderRequestDTO;
-import com.compassuol.sp.challenge.msorders.dto.CreateOrderResponseDTO;
-import com.compassuol.sp.challenge.msorders.dto.ProductModelDTO;
-import com.compassuol.sp.challenge.msorders.dto.RequestOrderDTO;
-import com.compassuol.sp.challenge.msorders.dto.ViaCepAddressDTO;
-import com.compassuol.sp.challenge.msorders.errors.BusinessErrorException;
-import com.compassuol.sp.challenge.msorders.errors.OrderCancelNotAllowedException;
-import com.compassuol.sp.challenge.msorders.errors.OrderNotFoundException;
-import com.compassuol.sp.challenge.msorders.model.AddressModel;
-import com.compassuol.sp.challenge.msorders.model.OrderModel;
-import com.compassuol.sp.challenge.msorders.model.OrderProductsModel;
-import com.compassuol.sp.challenge.msorders.proxy.ProductsProxy;
-import com.compassuol.sp.challenge.msorders.proxy.ViaCepProxy;
+import com.compassuol.sp.challenge.msorders.constant.OrderStatus;
+import com.compassuol.sp.challenge.msorders.exception.OrderNotFoundException;
+import com.compassuol.sp.challenge.msorders.mapper.OrderMapper;
+import com.compassuol.sp.challenge.msorders.model.Order;
+import com.compassuol.sp.challenge.msorders.model.request.CancelOrderRequest;
+import com.compassuol.sp.challenge.msorders.model.request.CreateOrderRequest;
+import com.compassuol.sp.challenge.msorders.model.response.OrderResponse;
 import com.compassuol.sp.challenge.msorders.repository.OrderRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final ProductsProxy proxy;
-    private final ViaCepProxy viaCepProxy;
-    private final TransferObjects transferObjects;
+  private final OrderRepository repository;
+  private final OrderMapper mapper;
 
-    public List<OrderModel> getOrdersByStatus(Status status) {
-        if (status == null) {
-            return orderRepository.findOrdersByCreateDateDesc();
-        }
-        return orderRepository.findOrdersByStatusAndCreateDateDesc(status);
-    }
+  public List<Order> getOrdersByStatus(OrderStatus status) {
+    return repository.findByStatus(status);
+  }
 
-    public Optional<OrderModel> findById(Long id) {
-        var order = orderRepository.findById(id);
-        if (order.isEmpty()) throw new OrderNotFoundException("order doesn't exists");
-        return order;
-    }
+  public OrderResponse findById(String id) {
+    var order = repository.findById(id).orElseThrow(OrderNotFoundException::new);
+    return mapper.toOrderResponse(order);
+  }
 
-    public CreateOrderResponseDTO createOrder(RequestOrderDTO request) {
-        double subtotalValue = 0.0;
-        for (OrderProductsModel productsModel : request.getProducts()) {
-            try {
-                ProductModelDTO product = proxy.getProductById(productsModel.getProductId());
-                subtotalValue += productsModel.getQuantity() * product.getValue();
-            } catch (FeignException ex) {
-                throw new BusinessErrorException("cannot find product id or your connection with" +
-                        " products microservice is falling");
-            }
-        }
-        try {
-            ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
-            AddressModel address = transferObjects.fillAddressModel(request, cep);
-            OrderModel order = transferObjects.fillOrderObject(request, address, subtotalValue);
-            return new CreateOrderResponseDTO(orderRepository.save(order));
-        } catch (ParseException ex) {
-            throw new RuntimeException();
-        }
-    }
+  public void createOrder(CreateOrderRequest request) {
+    //ignore cancelReason in mapper
+    //might return OrderResponse
+  }
 
-    public OrderModel cancelOrderById(Long id, CancelOrderRequestDTO cancelOrderRequest) {
+  public void cancelOrder(Long id, CancelOrderRequest request) {
+    //might return OrderResponse
+  }
 
-        var order = orderRepository.findById(id);
-        long daysBetween;
-        if (order.isPresent()) {
-            if (order.get().getStatus() == Status.SENT) {
-                throw new OrderCancelNotAllowedException("order cannot be canceled, because it has already been sent");}
-
-            daysBetween = Duration.between(order.get().getCreateDate(), LocalDateTime.now()).toDays();
-            if (daysBetween > 90) throw new
-                    OrderCancelNotAllowedException("order cannot be canceled because the time has been exceeded 90 days");
-
-            order.get().setStatus(Status.CANCELED);
-            order.get().setCancelDate(LocalDateTime.now());
-            order.get().setCancelReason(cancelOrderRequest.getCancelReason());
-        }
-
-        return orderRepository.save(order.get());
-    }
-
-    public OrderModel updateOrder(Long id, RequestOrderDTO request) {
-        OrderModel order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("order not found"));
-
-        if (order.getStatus() == Status.CANCELED || order.getStatus() == Status.SENT)
-            throw new BusinessErrorException("order with status 'canceled' or 'sent' cannot be updated.");
-
-        ViaCepAddressDTO cep = viaCepProxy.getViaCepAddress(request.getAddress().getPostalCode());
-        OrderModel updateOrder = transferObjects.updateOrderObject(order,request,cep);
-        updateOrder.setStatus(Status.SENT);
-        return orderRepository.save(updateOrder);
-    }
+  public void updateOrder(Long id, CreateOrderRequest request) {
+    //might return OrderResponse
+  }
 }
