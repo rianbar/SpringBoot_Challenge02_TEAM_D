@@ -8,15 +8,16 @@ import com.compassuol.sp.challenge.msorders.model.Address;
 import com.compassuol.sp.challenge.msorders.model.OrderProducts;
 
 public record OrderResponse(
-  String id,
   List<OrderProducts> products,
   Address address,
   PaymentType paymentType,
   Double subtotalValue,
   Double discount,
   Double totalValue,
-  String creationDate,
+  String createdAt,
+  String updatedAt,
   OrderStatus status,
+  String reference,
   String cancelReason,
   String cancelDate
 ) {

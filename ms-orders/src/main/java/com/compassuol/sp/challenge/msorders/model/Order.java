@@ -18,8 +18,10 @@ public record Order(
   Double subtotalValue,
   Double discount,
   Double totalValue,
-  LocalDateTime creationDate,
+  LocalDateTime createdAt,
+  LocalDateTime updatedAt,
   OrderStatus status,
+  String reference,
   String cancelReason,
   LocalDateTime cancelDate
 ) {

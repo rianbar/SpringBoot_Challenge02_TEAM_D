@@ -6,6 +6,6 @@ public record Address(
   String complement,
   String city,
   String state,
-  String postalCode
+  String zipCode
 ) {
 }

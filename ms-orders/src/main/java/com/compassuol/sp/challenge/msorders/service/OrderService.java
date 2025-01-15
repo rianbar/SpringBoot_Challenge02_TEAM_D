@@ -5,9 +5,11 @@ import com.compassuol.sp.challenge.msorders.exception.OrderNotFoundException;
 import com.compassuol.sp.challenge.msorders.mapper.OrderMapper;
 import com.compassuol.sp.challenge.msorders.model.Order;
 import com.compassuol.sp.challenge.msorders.model.request.CancelOrderRequest;
-import com.compassuol.sp.challenge.msorders.model.request.CreateOrderRequest;
+import com.compassuol.sp.challenge.msorders.model.request.OrderRequest;
 import com.compassuol.sp.challenge.msorders.model.response.OrderResponse;
 import com.compassuol.sp.challenge.msorders.repository.OrderRepository;
+import com.compassuol.sp.challenge.msorders.utils.OrderUtils;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class OrderService {
 
   private final OrderRepository repository;
   private final OrderMapper mapper;
+  private final OrderUtils utils;
 
   public List<Order> getOrdersByStatus(OrderStatus status) {
     return repository.findByStatus(status);
@@ -30,16 +33,16 @@ public class OrderService {
     return mapper.toOrderResponse(order);
   }
 
-  public void createOrder(CreateOrderRequest request) {
-    //ignore cancelReason in mapper
-    //might return OrderResponse
+  public void createOrder(OrderRequest request) {
+
+
   }
 
   public void cancelOrder(Long id, CancelOrderRequest request) {
     //might return OrderResponse
   }
 
-  public void updateOrder(Long id, CreateOrderRequest request) {
+  public void updateOrder(Long id, OrderRequest request) {
     //might return OrderResponse
   }
 }
