@@ -1,4 +1,4 @@
-package com.compassuol.sp.challenge.msorders.constant;
+package com.rian.ecommerce.challenge.msorders.constant;
 
 public enum PaymentType {
   CREDIT_CARD,

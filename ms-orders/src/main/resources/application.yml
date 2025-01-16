@@ -6,9 +6,13 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/ms-orders
+      database: ms-orders
   jpa:
     hibernate:
       ddl-auto: update
     generate-ddl: true
     show-sql: true
     open-in-view: true
+provider:
+  address:
+    url: http://viacep.com.br/ws

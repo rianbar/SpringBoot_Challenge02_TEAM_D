@@ -1,11 +1,4 @@
-package com.compassuol.sp.challenge.msorders.controller;
-
-import com.compassuol.sp.challenge.msorders.constant.OrderStatus;
-import com.compassuol.sp.challenge.msorders.model.Order;
-import com.compassuol.sp.challenge.msorders.model.request.CancelOrderRequest;
-import com.compassuol.sp.challenge.msorders.model.request.CreateOrderRequest;
-import com.compassuol.sp.challenge.msorders.model.response.OrderResponse;
-import com.compassuol.sp.challenge.msorders.service.OrderService;
+package com.rian.ecommerce.challenge.msorders.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
+import com.rian.ecommerce.challenge.msorders.model.Order;
+import com.rian.ecommerce.challenge.msorders.model.request.CancelOrderRequest;
+import com.rian.ecommerce.challenge.msorders.model.request.OrderRequest;
+import com.rian.ecommerce.challenge.msorders.model.response.OrderResponse;
+import com.rian.ecommerce.challenge.msorders.service.OrderService;
+
 import java.util.List;
 
 @RestController
@@ -35,17 +35,17 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.OK).body(service.getOrdersByStatus(status));
   }
 
-  /*
-  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<OrderResponse> getOrderById(@PathVariable String id) {
-    return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
+  @GetMapping(value = "/{reference}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<OrderResponse> getOrderByReference(@PathVariable String reference) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.findByReference(reference));
   }
 
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+  public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.createOrder(request));
   }
 
+  /*
   @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id, @RequestBody CreateOrderRequest request) {
     return ResponseEntity.status(HttpStatus.OK).body(service.updateOrder(id, request));

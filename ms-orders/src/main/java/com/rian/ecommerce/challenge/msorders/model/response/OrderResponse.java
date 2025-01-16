@@ -1,11 +1,11 @@
-package com.compassuol.sp.challenge.msorders.model.response;
+package com.rian.ecommerce.challenge.msorders.model.response;
 
 import java.util.List;
 
-import com.compassuol.sp.challenge.msorders.constant.PaymentType;
-import com.compassuol.sp.challenge.msorders.constant.OrderStatus;
-import com.compassuol.sp.challenge.msorders.model.Address;
-import com.compassuol.sp.challenge.msorders.model.OrderProducts;
+import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
+import com.rian.ecommerce.challenge.msorders.constant.PaymentType;
+import com.rian.ecommerce.challenge.msorders.model.Address;
+import com.rian.ecommerce.challenge.msorders.model.OrderProducts;
 
 public record OrderResponse(
   List<OrderProducts> products,

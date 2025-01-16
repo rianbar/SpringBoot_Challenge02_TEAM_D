@@ -1,4 +1,4 @@
-package com.compassuol.sp.challenge.msorders.model;
+package com.rian.ecommerce.challenge.msorders.model;
 
 public record Address(
   String street,
