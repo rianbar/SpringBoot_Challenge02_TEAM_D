@@ -1,4 +1,4 @@
-package com.compassuol.sp.challenge.msorders;
+package com.rian.ecommerce.challenge.msorders;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
