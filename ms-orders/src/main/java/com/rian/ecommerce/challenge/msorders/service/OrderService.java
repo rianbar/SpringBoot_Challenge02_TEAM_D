@@ -2,13 +2,16 @@ package com.rian.ecommerce.challenge.msorders.service;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
+import com.rian.ecommerce.challenge.msorders.exception.CancelOrderNotAllowedException;
 import com.rian.ecommerce.challenge.msorders.exception.OrderNotFoundException;
+import com.rian.ecommerce.challenge.msorders.exception.UpdateRequestRejectedException;
 import com.rian.ecommerce.challenge.msorders.model.Order;
 import com.rian.ecommerce.challenge.msorders.model.request.CancelOrderRequest;
 import com.rian.ecommerce.challenge.msorders.model.request.OrderRequest;
@@ -34,7 +37,6 @@ public class OrderService {
 
   public OrderResponse createOrder(OrderRequest request) {
     var entity = utils.mapToEntity(request);
-    entity.setAddress(utils.mapToAddress(request.address()));
     entity.setSubtotalValue(12.2); //subtotal dinamically introduced with kafka consumer
     entity.setTotalValue(utils.evaluateTotalValue(12.2, request.paymentType())); //subtotal dinamically introduced with kafka consumer
     entity.setDiscount(utils.evaluateDiscount(entity));
@@ -48,11 +50,31 @@ public class OrderService {
     return utils.mapToResponse(repository.save(order));
   }
 
-  public void cancelOrder(String reference, CancelOrderRequest request) {
-    //might return OrderResponse
+  public OrderResponse cancelOrder(String reference, CancelOrderRequest request) {
+    var order = repository.findByReference(reference).orElseThrow(OrderNotFoundException::new);
+    if (order.getStatus() == OrderStatus.SENT || getDaysSinceCreation(order.getCreatedAt()) > 90)
+      throw new CancelOrderNotAllowedException();
+
+    order.setStatus(OrderStatus.CANCELED);
+    order.setCancelDate(LocalDateTime.now());
+    order.setCancelReason(request.cancelReason());
+
+    return utils.mapToResponse(repository.save(order));
   }
 
-  public void updateOrder(Long id, OrderRequest request) {
-    //might return OrderResponse
+  public OrderResponse updateOrder(String reference, OrderRequest request) {
+    var order = repository.findByReference(reference).orElseThrow(OrderNotFoundException::new);
+    if (order.getStatus() == OrderStatus.CANCELED || order.getStatus() == OrderStatus.SENT)
+      throw new UpdateRequestRejectedException();
+
+    var entity = utils.mapToEntity(request);
+    entity.setUpdatedAt(LocalDateTime.now());;
+    return utils.mapToResponse(repository.save(entity));
   }
+
+  private long getDaysSinceCreation(LocalDateTime creationDate) {
+    return Duration.between(creationDate, LocalDateTime.now()).toDays();
+  }
+
+  // create a schedule method service to change order status by time here (only for while)
 }

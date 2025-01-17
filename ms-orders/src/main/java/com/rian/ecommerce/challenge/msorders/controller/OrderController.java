@@ -1,6 +1,5 @@
 package com.rian.ecommerce.challenge.msorders.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,15 +44,13 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.createOrder(request));
   }
 
-  /*
-  @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id, @RequestBody CreateOrderRequest request) {
-    return ResponseEntity.status(HttpStatus.OK).body(service.updateOrder(id, request));
+  @PutMapping(value = "/{reference}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<OrderResponse> updateOrder(@PathVariable String reference, @RequestBody OrderRequest request) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.updateOrder(reference, request));
   }
 
-  @PostMapping(value = "/{id}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id, @RequestBody CancelOrderRequest request) {
-    return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrder(id, request));
+  @PostMapping(value = "/{reference}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<OrderResponse> cancelOrder(@PathVariable String reference, @RequestBody CancelOrderRequest request) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.cancelOrder(reference, request));
   }
-    */
 }

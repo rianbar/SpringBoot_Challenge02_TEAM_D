@@ -16,7 +16,8 @@ public interface OrderMapper {
   @Mapping(target = ".", source = "address")
   OrderResponse toOrderResponse(Order order);
 
-  Order toEntity(OrderRequest request);
+  @Mapping(target = "address", source = "address")
+  Order toEntity(OrderRequest request, Address address);
 
   @Mapping(target = "street", source = "response.logradouro")
   @Mapping(target = "number", source = "number")

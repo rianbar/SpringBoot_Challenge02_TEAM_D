@@ -1,6 +1,5 @@
 package com.rian.ecommerce.challenge.msorders.utils;
 
-
 import org.springframework.stereotype.Component;
 
 import com.rian.ecommerce.challenge.msorders.constant.PaymentType;
@@ -29,7 +28,8 @@ public class OrderUtils {
   }
 
   public Order mapToEntity(OrderRequest request) {
-    return mapper.toEntity(request);
+    var address = mapToAddress(request.address());
+    return mapper.toEntity(request, address);
   }
 
   public Address mapToAddress(AddressRequest request) {
