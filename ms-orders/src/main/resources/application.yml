@@ -5,7 +5,7 @@ spring:
     name: ms-order
   data:
     mongodb:
-      uri: mongodb://admin:admin@localhost:27017/ms-orders
+      uri: mongodb://rian:rian@localhost:27017/ms-orders?authSource=admin
       database: ms-orders
   jpa:
     hibernate:

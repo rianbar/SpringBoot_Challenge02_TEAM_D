@@ -12,8 +12,8 @@ services:
     container_name: mongo
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_ROOT_USERNAME: rian
+      MONGO_INITDB_ROOT_PASSWORD: rian
     restart: always
     ports:
       - "27017:27017"
