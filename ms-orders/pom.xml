@@ -8,7 +8,7 @@
 		<version>3.4.1</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.compassuol.sp.challenge</groupId>
+	<groupId>com.rian.ecommerce.challenge</groupId>
 	<artifactId>ms-orders</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ms-orders</name>
