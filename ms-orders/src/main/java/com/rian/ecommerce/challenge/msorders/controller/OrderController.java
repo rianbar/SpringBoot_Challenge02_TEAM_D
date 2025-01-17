@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
@@ -29,8 +28,8 @@ public class OrderController {
 
   private final OrderService service;
 
-  @GetMapping
-  public ResponseEntity<List<Order>> getOrdersByStatus(@RequestParam OrderStatus status) {
+  @GetMapping(value = "status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<Order>> getOrdersByStatus(@PathVariable OrderStatus status) {
     return ResponseEntity.status(HttpStatus.OK).body(service.getOrdersByStatus(status));
   }
 
