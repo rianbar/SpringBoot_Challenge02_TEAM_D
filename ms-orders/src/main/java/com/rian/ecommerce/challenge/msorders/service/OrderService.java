@@ -9,10 +9,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
+import com.rian.ecommerce.challenge.msorders.constant.PaymentType;
 import com.rian.ecommerce.challenge.msorders.exception.CancelOrderNotAllowedException;
 import com.rian.ecommerce.challenge.msorders.exception.OrderNotFoundException;
 import com.rian.ecommerce.challenge.msorders.exception.UpdateRequestRejectedException;
 import com.rian.ecommerce.challenge.msorders.model.Order;
+import com.rian.ecommerce.challenge.msorders.model.request.AddressRequest;
 import com.rian.ecommerce.challenge.msorders.model.request.CancelOrderRequest;
 import com.rian.ecommerce.challenge.msorders.model.request.OrderRequest;
 import com.rian.ecommerce.challenge.msorders.model.response.OrderResponse;
@@ -62,19 +64,29 @@ public class OrderService {
     return utils.mapToResponse(repository.save(order));
   }
 
-  public OrderResponse updateOrder(String reference, OrderRequest request) {
+  public OrderResponse updateOrderAddress(String reference, AddressRequest request) {
+    var order = isOrderUpdatable(reference);
+
+    order.setAddress(utils.mapToAddress(request));
+    return utils.mapToResponse(repository.save(order));
+  }
+
+  public OrderResponse updatePaymentType(String reference, PaymentType paymentType) {
+    var order = isOrderUpdatable(reference);
+
+    order.setPaymentType(paymentType);
+    return utils.mapToResponse(repository.save(order));
+  }
+
+  private Order isOrderUpdatable(String reference) {
     var order = repository.findByReference(reference).orElseThrow(OrderNotFoundException::new);
     if (order.getStatus() == OrderStatus.CANCELED || order.getStatus() == OrderStatus.SENT)
       throw new UpdateRequestRejectedException();
 
-    var entity = utils.mapToEntity(request);
-    entity.setUpdatedAt(LocalDateTime.now());;
-    return utils.mapToResponse(repository.save(entity));
+    return order;
   }
 
   private long getDaysSinceCreation(LocalDateTime creationDate) {
     return Duration.between(creationDate, LocalDateTime.now()).toDays();
   }
-
-  // create a schedule method service to change order status by time here (only for while)
 }

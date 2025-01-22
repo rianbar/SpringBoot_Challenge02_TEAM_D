@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rian.ecommerce.challenge.msorders.constant.OrderStatus;
+import com.rian.ecommerce.challenge.msorders.constant.PaymentType;
 import com.rian.ecommerce.challenge.msorders.model.Order;
+import com.rian.ecommerce.challenge.msorders.model.request.AddressRequest;
 import com.rian.ecommerce.challenge.msorders.model.request.CancelOrderRequest;
 import com.rian.ecommerce.challenge.msorders.model.request.OrderRequest;
 import com.rian.ecommerce.challenge.msorders.model.response.OrderResponse;
@@ -44,8 +46,13 @@ public class OrderController {
   }
 
   @PutMapping(value = "/{reference}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<OrderResponse> updateOrder(@PathVariable String reference, @RequestBody OrderRequest request) {
-    return ResponseEntity.status(HttpStatus.OK).body(service.updateOrder(reference, request));
+  public ResponseEntity<OrderResponse> updateAddress(@PathVariable String reference, @RequestBody AddressRequest request) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.updateOrderAddress(reference, request));
+  }
+
+  @PutMapping(value = "/{reference}/{paymentType}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<OrderResponse> updatePaymentType(@PathVariable String reference, @PathVariable PaymentType paymentType) {
+    return ResponseEntity.status(HttpStatus.OK).body(service.updatePaymentType(reference, paymentType));
   }
 
   @PostMapping(value = "/{reference}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
