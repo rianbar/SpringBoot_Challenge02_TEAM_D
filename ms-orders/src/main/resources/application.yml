@@ -13,6 +13,8 @@ spring:
     generate-ddl: true
     show-sql: true
     open-in-view: true
+  kafka:
+    bootstrap-servers: localhost:9092
 provider:
   address:
     url: http://viacep.com.br/ws
